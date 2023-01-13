@@ -52,23 +52,24 @@ void trace_stack(unsigned int max) {
 // Requires the following variables to be set already:
 //   char buff[10];
 //   unsigned int reg;
-#define DO_PRINT_REGISTER(rname) \
-    puts("  " rname ":"); \
+#define DO_PRINT_REGISTER(prefix_string, rname) \
+    puts(prefix_string rname ":"); \
     asm("mov %%" rname ", %0" : "=r"(reg)); \
     puts(hexify(buff, reg));
 
 void dump_registers(void) {
     char buff[10];
     unsigned int reg;
-    DO_PRINT_REGISTER("eax");
-    DO_PRINT_REGISTER("ebx");
-    DO_PRINT_REGISTER("ecx");
-    DO_PRINT_REGISTER("edx");
+    // the " " is on the first register on every line - the rest use two spaces
+    DO_PRINT_REGISTER(" ", "eax");
+    DO_PRINT_REGISTER("  ", "ebx");
+    DO_PRINT_REGISTER("  ", "ecx");
+    DO_PRINT_REGISTER("  ", "edx");
+    DO_PRINT_REGISTER("  ", "esp");
     puts("\n");
-    DO_PRINT_REGISTER("esp");
-    DO_PRINT_REGISTER("ebp");
-    DO_PRINT_REGISTER("esi");
-    DO_PRINT_REGISTER("edi");
+    DO_PRINT_REGISTER(" ", "ebp");
+    DO_PRINT_REGISTER("  ","esi");
+    DO_PRINT_REGISTER("  ","edi");
     puts("\n");
 }
 

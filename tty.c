@@ -56,7 +56,7 @@ void putc_colored(char c, unsigned short color) {
 }
 
 void putc(char c) {
-    putc_colored(c, WHITE_COLOR);
+    putc_colored(c, WHITE);
 }
 
 void puts(const char *s) {

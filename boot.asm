@@ -16,9 +16,8 @@ _start:
 
 ; TODO: check that we are using multiboot
 
-    xor  ebp, ebp           ; sets ebp to NULL so the stack walker will stop here
-
-; the ebp will be pushed by main later on
+    xor  ebp, ebp           ; sets ebp to NULL so the stack walker will stop here,
+                            ; the ebp will be pushed by main later on
 
     call main               ; from main.c
 
