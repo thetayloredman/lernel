@@ -22,8 +22,8 @@ all: lernel iso
 %.o: %.c
 	$(CC) $(CC_ARGS) -c $^ -o $@
 
-lernel: linker.ld boot.o main.o tty.o ports.o panic.o
-	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o main.o tty.o ports.o panic.o
+lernel: linker.ld boot.o main.o tty.o ports.o panic.o regs.o
+	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o main.o tty.o ports.o panic.o regs.o
 
 iso: lernel lernel.map
 	$(MKDIR) -p $(ISO_DIR)/boot/grub

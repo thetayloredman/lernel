@@ -4,6 +4,7 @@
 #include <ports.h>
 #include <multiboot.h>
 #include <panic.h>
+#include <regs.h>
 
 void main() {
     struct multiboot_header *multiboot;
@@ -12,6 +13,8 @@ void main() {
     disable_cursor();
     clear();
     puts("main: hello from main()\n");
-    panic("unable to find epic memes");
+    cpu_registers_t *regs;
+    init_regs(regs);
+    panic("unable to find epic memes", regs);
     return;
 }

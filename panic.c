@@ -3,6 +3,7 @@
 #include <tty.h>
 #include <ints.h>
 #include <stackframe.h>
+#include <regs.h>
 
 char *hexify(char result[10], uint32_t v) {
     result = "0x00000000"; // length of 0x00000000 = 10
@@ -45,42 +46,50 @@ void trace_stack(unsigned int max) {
     }
 }
 
-// Takes an input rname and outputs code like this:
-//   puts("  eax:");
-//   asm("mov %%eax, %0" : "=r"(reg));
-//   puts(hexify(buff, reg));
+// Takes an input rname and outputs code to print it
 // Requires the following variables to be set already:
 //   char buff[10];
-//   unsigned int reg;
+//   cpu_registers_t *regs;
+// The parameters are as follows:
+// - prefix_string: the string to print before the register name
+// - rname: the name of the register (no quotes)
 #define DO_PRINT_REGISTER(prefix_string, rname) \
-    puts(prefix_string rname ":"); \
-    asm("mov %%" rname ", %0" : "=r"(reg)); \
-    puts(hexify(buff, reg));
+    puts(prefix_string #rname ":"); \
+    puts(hexify(buff, regs->rname));
 
-void dump_registers(void) {
+void dump_registers(cpu_registers_t *regs) {
     char buff[10];
-    unsigned int reg;
-    // the " " is on the first register on every line - the rest use two spaces
-    DO_PRINT_REGISTER(" ", "eax");
-    DO_PRINT_REGISTER("  ", "ebx");
-    DO_PRINT_REGISTER("  ", "ecx");
-    DO_PRINT_REGISTER("  ", "edx");
-    DO_PRINT_REGISTER("  ", "esp");
+    DO_PRINT_REGISTER(" ", eax);
+    DO_PRINT_REGISTER("  ", ebx);
+    DO_PRINT_REGISTER("  ", ecx);
+    DO_PRINT_REGISTER("  ", edx);
+    DO_PRINT_REGISTER("  ", esp);
     puts("\n");
-    DO_PRINT_REGISTER(" ", "ebp");
-    DO_PRINT_REGISTER("  ","esi");
-    DO_PRINT_REGISTER("  ","edi");
+    DO_PRINT_REGISTER(" ", ebp);
+    DO_PRINT_REGISTER("  ", esi);
+    DO_PRINT_REGISTER("  ", edi);
+    DO_PRINT_REGISTER("  ", eip);
+    DO_PRINT_REGISTER("   ", cs);
     puts("\n");
+    DO_PRINT_REGISTER("  ", ds);
+    DO_PRINT_REGISTER("   ", es);
+    DO_PRINT_REGISTER("   ", fs);
+    DO_PRINT_REGISTER("   ", gs);
+    DO_PRINT_REGISTER("   ", ss);
+    puts("\n\n");
+    puts("EFLAGS: ");
+    puts(hexify(buff, regs->eflags));
+    puts("\n\n");
 }
 
-void panic(const char *message) {
+void panic(const char *message, cpu_registers_t *regs) {
     puts("panic(): ");
     puts(message);
     puts("\n");
 
     // TODO: cpu type and stuff
 
-    dump_registers();
+    dump_registers(regs);
 
     // TODO: pick a more specific limit value
     trace_stack(5);
@@ -88,17 +97,18 @@ void panic(const char *message) {
     puts("end kernel panic: ");
     puts(message);
     puts("\nhalting system.");
+    asm("cli");
     asm("hlt");
 }
 
-void oops(const char *message) {
+void oops(const char *message, cpu_registers_t *regs) {
     puts("oops(): ");
     puts(message);
     puts("\n");
 
     // TODO: cpu type and stuff
 
-    dump_registers();
+    dump_registers(regs);
 
     // TODO: pick a more specific limit value
     trace_stack(5);

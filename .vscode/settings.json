@@ -3,6 +3,7 @@
         "vga.h": "c"
     },
     "cSpell.words": [
+        "hexify",
         "multiboot"
     ]
 }
