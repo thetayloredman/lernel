@@ -14,12 +14,22 @@ _start:
     cli                     ; bye bye interrupts
     mov  esp, initial_esp   ; set the stack pointer
 
-; TODO: check that we are using multiboot
-
     xor  ebp, ebp           ; sets ebp to NULL so the stack walker will stop here,
                             ; the ebp will be pushed by main later on
 
-    call main               ; from main.c
+    ; our state is as follows:
+    ; eax - multiboot magic
+    ; ebx - multiboot info pointer
+    ; the rest: we don't give a fuck.
+    ; now we'll push our arguments to main,
+    ; which is ebx's pointer to multiboot_info_t.
+    ; we're pushing these as arguments
+    ; to make our life easier if anything changes in that function (aka
+    ; if any function call uses eax/ebx)
+    push ebx ; multiboot_info_t *
+    push eax ; uint32_t magic
+    ; main.c: void main(uint32_t, multiboot_info_t *)
+    call main
 
     push exit_msg
     call puts

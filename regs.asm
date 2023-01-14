@@ -49,9 +49,7 @@ init_regs:
     ; do the actual move
     mov [esp + 4 + cpu_registers_t.eflags], eax
     ; now we're going to work on eip, so we read the stack pointer's value (points to return address)
-    ; FIXME: why does this point to 0x2badb01e? that seems scary
     mov eax, [esp]
-    ; again, you can't "mov [ADDR1], [ADDR2]", so we have to do this hack with eax
     mov [esp + 4 + cpu_registers_t.eip], eax
     mov eax, [esp + 4 + cpu_registers_t.eax]
     ret
