@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO: printf
 void put_newline(void);
 void disable_cursor(void);
 void puts(const char *);

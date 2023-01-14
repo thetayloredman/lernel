@@ -17,5 +17,6 @@
         "multiboot",
         "shdr",
         "hexify"
-    ]
+    ],
+    "C_Cpp.dimInactiveRegions": false
 }

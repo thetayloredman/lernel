@@ -1,3 +1,4 @@
+; FIXME: why won't the debug symbols load here?
 bits 32
 
 struc cpu_registers_t
@@ -39,12 +40,18 @@ init_regs:
     mov [esp + 4 + cpu_registers_t.fs], fs
     mov [esp + 4 + cpu_registers_t.gs], gs
     mov [esp + 4 + cpu_registers_t.ss], ss
-    push eax                                    ; save eax for later
-    pushfd                                      ; push eflags onto the stack...
-    pop eax                                     ; ...and pop into eax. these two would usually be something like "mov eax, eflags"...
-                                                ; ...but you can't do that.
-    mov [esp + 4 + cpu_registers_t.eflags], eax ; then we store eflags in the struct
-    mov eax, [esp + 4]                          ; now we want to work with eip. this gets our return address into eax...
-    mov [esp + 4 + cpu_registers_t.eip], eax    ; ...and stores it in the struct. sadly there is no "mov [ADDR1], [ADDR2]" so we use eax for this.
-    pop eax                                     ; restore eax
+    ; pushfd pushes the EFLAGS register onto the stack
+    ; the series of these two following operations was basically what "mov [...], eflags" should have been,
+    ; but for some reason that isn't possible
+    pushfd
+    ; pop into eax -- we restore eax later
+    pop eax
+    ; do the actual move
+    mov [esp + 4 + cpu_registers_t.eflags], eax
+    ; now we're going to work on eip, so we read the stack pointer's value (points to return address)
+    ; FIXME: why does this point to 0x2badb01e? that seems scary
+    mov eax, [esp]
+    ; again, you can't "mov [ADDR1], [ADDR2]", so we have to do this hack with eax
+    mov [esp + 4 + cpu_registers_t.eip], eax
+    mov eax, [esp + 4 + cpu_registers_t.eax]
     ret

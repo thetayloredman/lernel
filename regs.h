@@ -1,5 +1,5 @@
 #pragma once
-#include <ints.h>
+#include <types.h>
 
 struct cpu_registers {
     uint32_t eax;

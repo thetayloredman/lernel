@@ -1,3 +1,5 @@
 #pragma once
 
 #define LERNEL_VERSION "0.1"
+#define LERNEL_PANIC_DUMP_REGISTERS
+#define LERNEL_OOPS_DUMP_REGISTERS
