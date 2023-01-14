@@ -1,9 +1,21 @@
 {
     "files.associations": {
-        "vga.h": "c"
+        "vga.h": "c",
+        "stackframe.h": "c",
+        "optional": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "variant": "c"
     },
     "cSpell.words": [
-        "hexify",
-        "multiboot"
+        "loadksyms",
+        "multiboot",
+        "shdr",
+        "hexify"
     ]
 }

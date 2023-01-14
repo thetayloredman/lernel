@@ -5,25 +5,26 @@ LD = ld
 AS = nasm
 CC = gcc
 
-CC_ARGS = -nostdinc -I. -m32 -Wno-builtin-declaration-mismatch -fno-stack-protector
-QEMU_ARGS = -d int
+CC_ARGS = -nostdinc -I. -m32 -Wno-builtin-declaration-mismatch -fno-stack-protector $(ADDITIONAL_CC_ARGS)
+AS_ARGS = -f elf32 $(ADDITIONAL_AS_ARGS)
+QEMU_MEM = 512
+QEMU_ARGS = -m $(QEMU_MEM) $(ADDITIONAL_QEMU_ARGS)
 
 BIN = lernel
 ISO = lernel.iso
 ISO_DIR = iso
-QEMU_MEM = 512
 
 .PHONY: all
 all: lernel iso
 
 %.o: %.asm
-	$(AS) -f elf32 $^ -o $@
+	$(AS) $(AS_ARGS) $^ -o $@
 
 %.o: %.c
 	$(CC) $(CC_ARGS) -c $^ -o $@
 
-lernel: linker.ld boot.o main.o tty.o ports.o panic.o regs.o
-	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o main.o tty.o ports.o panic.o regs.o
+lernel: linker.ld boot.o main.o tty.o ports.o panic.o regs.o ksyms.o
+	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o main.o tty.o ports.o panic.o regs.o ksyms.o
 
 iso: lernel lernel.map
 	$(MKDIR) -p $(ISO_DIR)/boot/grub
@@ -38,7 +39,7 @@ lernel.map: lernel
 
 .PHONY: run
 run: iso
-	qemu-system-i386 -cdrom $(ISO) -m $(QEMU_MEM) $(QEMU_ARGS)
+	qemu-system-i386 -cdrom $(ISO) $(QEMU_ARGS)
 
 .PHONY: clean
 clean:

@@ -1,9 +1,10 @@
 #include <panic.h>
 
 #include <tty.h>
-#include <ints.h>
+#include <types.h>
 #include <stackframe.h>
 #include <regs.h>
+#include <ksyms.h>
 
 char *hexify(char result[10], uint32_t v) {
     result = "0x00000000"; // length of 0x00000000 = 10
@@ -31,7 +32,9 @@ char *hexify(char result[10], uint32_t v) {
 }
 
 void trace_stack(unsigned int max) {
-    puts("Call stack:\n");
+    unsigned short ksyms_are_loaded = is_ksyms_loaded();
+    if (ksyms_are_loaded) puts("Call stack:\n");
+    else puts("Call stack (ksyms unavailable):\n");
     struct stackframe *stack;
     char result[10];
     asm("mov %%ebp, %0" : "=r"(stack));
@@ -41,6 +44,16 @@ void trace_stack(unsigned int max) {
         if(frame==0) puts("-> ");
         else puts("   ");
         puts(hexify(result, stack->eip));
+        if (ksyms_are_loaded) {
+            elf32_shdr_t *sym = lookup_ksym_by_address(stack->eip);
+            if (sym) {
+                puts(" (");
+                puts(elf_shdr_string(sym->name));
+                puts(")");
+            } else {
+                puts(" (unknown)");
+            }
+        }
         puts("\n");
         stack = stack->ebp;
     }

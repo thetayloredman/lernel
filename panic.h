@@ -1,6 +1,7 @@
 #pragma once
-#include <ints.h>
+
 #include <regs.h>
+#include <types.h>
 
 char *hexify(char[10], uint32_t); // TODO: relocate to a new file
 // TODO: format strings like printf?
