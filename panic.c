@@ -64,7 +64,6 @@ void trace_stack(unsigned int max) {
     asm("mov %%ebp, %0" : "=r"(stack));
     // we stop when we hit NULL  vvvvvvvv, this is set in boot.asm
     for (unsigned int frame = 0; stack && (frame < max); frame++) {
-        // TODO: symbol lookup
         if(frame==0) puts("-> ");
         else puts("   ");
         puts(hexify_double(result, stack->eip));
