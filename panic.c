@@ -56,7 +56,9 @@ char *hexify_word(char result[6], uint16_t v) {
 }
 
 void trace_stack(unsigned int max) {
-    puts("Call stack:\n");
+    unsigned short ksyms_loaded = is_ksyms_loaded();
+    if (ksyms_loaded) puts("Call stack:\n");
+    else puts("Call stack (no symbol table information available):\n");
     struct stackframe *stack;
     char result[10];
     asm("mov %%ebp, %0" : "=r"(stack));
@@ -66,6 +68,24 @@ void trace_stack(unsigned int max) {
         if(frame==0) puts("-> ");
         else puts("   ");
         puts(hexify_double(result, stack->eip));
+        if (ksyms_loaded) {
+            elf32_sym_t *sym = get_ksym_by_address(stack->eip);
+            if (sym) {
+                puts(" (");
+                puts((char *)(get_shdr_string(sym->name)));
+                puts("+");
+                uint32_t diff = stack->eip - sym->value;
+                if (diff > 0xFFFF) {
+                    char smaller_buffer[6];
+                    puts(hexify_double(smaller_buffer, diff));
+                } else {
+                    puts(hexify_word(result, diff));
+                }
+                puts(")");
+            } else {
+                puts(" (unknown)");
+            }
+        }
         puts("\n");
         stack = stack->ebp;
     }

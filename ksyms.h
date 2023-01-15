@@ -16,4 +16,16 @@ struct elf32_shdr {
 };
 typedef struct elf32_shdr elf32_shdr_t;
 
+struct elf32_sym {
+    uint32_t name;
+    uint32_t value;
+    uint32_t size;
+    uint8_t info;
+    uint8_t other;
+    uint16_t shndx;
+};
+typedef struct elf32_sym elf32_sym_t;
+
+unsigned short is_ksyms_loaded();
 void loadksyms(multiboot_elf_section_header_table_t *);
+char *get_shdr_string(uint32_t);
