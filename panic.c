@@ -137,10 +137,17 @@ char *hexify_word(char result[6], uint16_t v) {
     }
 #endif
 
+void dump_kernel_info(void) {
+    puts("Lernel version " LERNEL_VERSION "\n");
+}
+
 void panic(const char *message, cpu_registers_t *regs) {
     puts("panic(): ");
     puts(message);
     puts("\n");
+
+    puts("\n");
+    dump_kernel_info();
 
     // TODO: cpu type and stuff
 
