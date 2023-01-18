@@ -117,7 +117,7 @@ void trace_stack(unsigned int max) {
         puts(prefix_string #rname ":"); \
         puts(hexify_##rtype(buff, regs->rname));
 
-void dump_registers(cpu_registers_t * regs) {
+void dump_registers(cpu_registers_t *regs) {
     char buff[10];
     DO_PRINT_REGISTER(" ", eax, double);
     DO_PRINT_REGISTER("  ", ebx, double);
@@ -149,7 +149,7 @@ void dump_kernel_info(void) {
     puts("Lernel version " LERNEL_VERSION "\n");
 }
 
-void panic(const char *message, cpu_registers_t * regs) {
+void panic(const char *message, cpu_registers_t *regs) {
     puts("panic(): ");
     puts(message);
     puts("\n");
@@ -176,7 +176,7 @@ void panic(const char *message, cpu_registers_t * regs) {
     asm("hlt");
 }
 
-void oops(const char *message, cpu_registers_t * regs) {
+void oops(const char *message, cpu_registers_t *regs) {
     puts("oops(): ");
     puts(message);
     puts("\n");
