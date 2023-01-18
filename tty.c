@@ -16,7 +16,9 @@ void vga_scroll(void) {
 
     // We will loop over every character except the first VGA_COLUMNS size.
     unsigned int newIndex = 0;
-    for (unsigned int oldIndex = VGA_COLUMNS; oldIndex < VGA_BUFFER_SIZE; oldIndex++, newIndex++) {
+
+    for (unsigned int oldIndex = VGA_COLUMNS; oldIndex < VGA_BUFFER_SIZE;
+         oldIndex++, newIndex++) {
         terminal_buffer[newIndex] = terminal_buffer[oldIndex];
     }
     // Write an empty line.
@@ -41,8 +43,7 @@ void putc_colored(char c, unsigned short color) {
         vga_row++;
     } else if (c == '\r') {
         vga_column = 0;
-    }
-    else {
+    } else {
         terminal_buffer[get_vga_index()] = (unsigned short)c | color << 8;
         vga_column++;
         if (vga_column >= VGA_COLUMNS) {
@@ -61,6 +62,7 @@ void putc(char c) {
 
 void puts(const char *s) {
     int index = 0;
+
     while (s[index]) {
         putc(s[index]);
         index++;

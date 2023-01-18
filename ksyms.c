@@ -30,6 +30,7 @@ elf32_sym_t *get_ksym_by_address(uint32_t addr) {
     for (int i = 0; i < mb_elf_section_header_table->num; i++) {
         if (elf_shdr[i].type == 2) {
             elf32_sym_t *sym_table = (elf32_sym_t *)elf_shdr[i].addr;
+
             for (int j = 0; j < elf_shdr[i].size / sizeof(elf32_sym_t); j++) {
                 if ((offset == -1 || (addr - sym_table[j].value) < offset)) {
                     candidate = &sym_table[j];

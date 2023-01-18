@@ -6,12 +6,12 @@
 #ifdef LERNEL_KSYMS_ENABLED
 
 struct elf32_shdr {
-    uint32_t name; // index into the string table
+    uint32_t name;      // index into the string table
     uint32_t type;
     uint32_t flags;
-    uint32_t addr; // address in memory
+    uint32_t addr;      // address in memory
     uint32_t offset;
-    uint32_t size; // section's size in bytes
+    uint32_t size;      // section's size in bytes
     uint32_t link;
     uint32_t info;
     uint32_t addralign;

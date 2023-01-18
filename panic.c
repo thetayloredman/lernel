@@ -13,13 +13,13 @@ char *hexify_double(char result[10], uint32_t v) {
     if (v == 0) {
         return result;
     }
-    
     // This is basically hex-only itoa(). We will modulo 16 the value
     // and set the next value in index to that, then bit shift over 4 and repeat.
     int outIndex = 9;
-    
+
     while (v != 0) {
         int digit = v % 16;
+
         if (digit < 10) {
             result[outIndex] = '0' + digit;
         } else {
@@ -43,6 +43,7 @@ char *hexify_word(char result[6], uint16_t v) {
 
     while (v != 0) {
         int digit = v % 16;
+
         if (digit < 10) {
             result[outIndex] = '0' + digit;
         } else {
@@ -56,46 +57,51 @@ char *hexify_word(char result[6], uint16_t v) {
 }
 
 #if defined(LERNEL_PANIC_DUMP_STACK) || defined(LERNEL_OOPS_DUMP_STACK)
-    void trace_stack(unsigned int max) {
-#ifdef LERNEL_KSYMS_ENABLED
-        unsigned short ksyms_loaded = is_ksyms_loaded();
-        if (ksyms_loaded) puts("Call stack:\n");
-        else puts("Call stack (no symbol table information available):\n");
-#else
-        puts("Call stack (symbol table information is disabled):\n");
-#endif
-        struct stackframe *stack;
-        char result[10];
-        asm("mov %%ebp, %0" : "=r"(stack));
-        // we stop when we hit NULL  vvvvvvvv, this is set in boot.asm
-        for (unsigned int frame = 0; stack && (frame < max); frame++) {
-            if(frame==0) puts("-> ");
-            else puts("   ");
-            puts(hexify_double(result, stack->eip));
-#ifdef LERNEL_KSYMS_ENABLED
-            if (ksyms_loaded) {
-                elf32_sym_t *sym = get_ksym_by_address(stack->eip);
-                if (sym) {
-                    puts(" (");
-                    puts((char *)(get_shdr_string(sym->name)));
-                    puts("+");
-                    uint32_t diff = stack->eip - sym->value;
-                    if (diff > 0xFFFF) {
-                        puts(hexify_double(result, diff));
-                    } else {
-                        char smaller_buffer[6];
-                        puts(hexify_word(smaller_buffer, diff));
-                    }
-                    puts(")");
+void trace_stack(unsigned int max) {
+#   ifdef LERNEL_KSYMS_ENABLED
+    unsigned short ksyms_loaded = is_ksyms_loaded();
+
+    if (ksyms_loaded) puts("Call stack:\n");
+    else puts("Call stack (no symbol table information available):\n");
+#   else
+    puts("Call stack (symbol table information is disabled):\n");
+#   endif
+    struct stackframe *stack;
+    char result[10];
+
+  asm("mov %%ebp, %0":"=r"(stack));
+    // we stop when we hit NULL  vvvvvvvv, this is set in boot.asm
+    for (unsigned int frame = 0; stack && (frame < max); frame++) {
+        if (frame == 0) puts("-> ");
+        else puts("   ");
+        puts(hexify_double(result, stack->eip));
+#   ifdef LERNEL_KSYMS_ENABLED
+        if (ksyms_loaded) {
+            elf32_sym_t *sym = get_ksym_by_address(stack->eip);
+
+            if (sym) {
+                puts(" (");
+                puts((char *)(get_shdr_string(sym->name)));
+                puts("+");
+                uint32_t diff = stack->eip - sym->value;
+
+                if (diff > 0xFFFF) {
+                    puts(hexify_double(result, diff));
                 } else {
-                    puts(" (unknown)");
+                    char smaller_buffer[6];
+
+                    puts(hexify_word(smaller_buffer, diff));
                 }
+                puts(")");
+            } else {
+                puts(" (unknown)");
             }
-#endif
-            puts("\n");
-            stack = stack->ebp;
         }
+#   endif
+        puts("\n");
+        stack = stack->ebp;
     }
+}
 #endif
 
 #if defined(LERNEL_PANIC_DUMP_REGISTERS) || defined(LERNEL_OOPS_DUMP_REGISTERS)
@@ -111,37 +117,39 @@ char *hexify_word(char result[6], uint16_t v) {
         puts(prefix_string #rname ":"); \
         puts(hexify_##rtype(buff, regs->rname));
 
-    void dump_registers(cpu_registers_t *regs) {
-        char buff[10];
-        DO_PRINT_REGISTER(" ", eax, double);
-        DO_PRINT_REGISTER("  ", ebx, double);
-        DO_PRINT_REGISTER("  ", ecx, double);
-        DO_PRINT_REGISTER("  ", edx, double);
-        DO_PRINT_REGISTER("  ", esp, double);
-        puts("\n");
-        DO_PRINT_REGISTER(" ", ebp, double);
-        DO_PRINT_REGISTER("  ", esi, double);
-        DO_PRINT_REGISTER("  ", edi, double);
-        DO_PRINT_REGISTER("  ", eip, double);
-        DO_PRINT_REGISTER("   ", cs, word);
-        puts("\n");
-        DO_PRINT_REGISTER("  ", ds, word);
-        DO_PRINT_REGISTER("       ", es, word);
-        DO_PRINT_REGISTER("       ", fs, word);
-        DO_PRINT_REGISTER("       ", gs, word);
-        DO_PRINT_REGISTER("       ", ss, word);
-        puts("\n\n");
-        puts("EFLAGS: ");
-        puts(hexify_double(buff, regs->eflags));
-        puts("\n");
-    }
+void dump_registers(cpu_registers_t * regs) {
+    char buff[10];
+    DO_PRINT_REGISTER(" ", eax, double);
+    DO_PRINT_REGISTER("  ", ebx, double);
+    DO_PRINT_REGISTER("  ", ecx, double);
+    DO_PRINT_REGISTER("  ", edx, double);
+    DO_PRINT_REGISTER("  ", esp, double);
+
+    puts("\n");
+    DO_PRINT_REGISTER(" ", ebp, double);
+    DO_PRINT_REGISTER("  ", esi, double);
+    DO_PRINT_REGISTER("  ", edi, double);
+    DO_PRINT_REGISTER("  ", eip, double);
+
+    DO_PRINT_REGISTER("   ", cs, word);
+    puts("\n");
+    DO_PRINT_REGISTER("  ", ds, word);
+    DO_PRINT_REGISTER("       ", es, word);
+    DO_PRINT_REGISTER("       ", fs, word);
+    DO_PRINT_REGISTER("       ", gs, word);
+    DO_PRINT_REGISTER("       ", ss, word);
+    puts("\n\n");
+    puts("EFLAGS: ");
+    puts(hexify_double(buff, regs->eflags));
+    puts("\n");
+}
 #endif
 
 void dump_kernel_info(void) {
     puts("Lernel version " LERNEL_VERSION "\n");
 }
 
-void panic(const char *message, cpu_registers_t *regs) {
+void panic(const char *message, cpu_registers_t * regs) {
     puts("panic(): ");
     puts(message);
     puts("\n");
@@ -151,15 +159,15 @@ void panic(const char *message, cpu_registers_t *regs) {
 
     // TODO: cpu type and stuff
 
-#   ifdef LERNEL_PANIC_DUMP_REGISTERS
-        puts("\n");
-        dump_registers(regs);
-#   endif
+#ifdef LERNEL_PANIC_DUMP_REGISTERS
+    puts("\n");
+    dump_registers(regs);
+#endif
 
-#   ifdef LERNEL_PANIC_DUMP_STACK
-        puts("\n");
-        trace_stack(LERNEL_STACK_DUMP_LIMIT);
-#   endif
+#ifdef LERNEL_PANIC_DUMP_STACK
+    puts("\n");
+    trace_stack(LERNEL_STACK_DUMP_LIMIT);
+#endif
 
     puts("\nend kernel panic: ");
     puts(message);
@@ -168,22 +176,22 @@ void panic(const char *message, cpu_registers_t *regs) {
     asm("hlt");
 }
 
-void oops(const char *message, cpu_registers_t *regs) {
+void oops(const char *message, cpu_registers_t * regs) {
     puts("oops(): ");
     puts(message);
     puts("\n");
 
     // TODO: cpu type and stuff
 
-#   ifdef LERNEL_OOPS_DUMP_REGISTERS
-        dump_registers(regs);
-#   endif
+#ifdef LERNEL_OOPS_DUMP_REGISTERS
+    dump_registers(regs);
+#endif
 
     puts("\n");
 
-#   ifdef LERNEL_OOPS_DUMP_STACK
-        trace_stack(LERNEL_STACK_DUMP_LIMIT);
-#   endif
+#ifdef LERNEL_OOPS_DUMP_STACK
+    trace_stack(LERNEL_STACK_DUMP_LIMIT);
+#endif
 
     puts("\nend oops: ");
     puts(message);

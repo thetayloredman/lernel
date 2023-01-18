@@ -1,1 +1,1 @@
-find . -type f -name '*.c' | xargs indent
+find . -type f \( -name '*.c' -o -name '*.h' \) | xargs indent
