@@ -20,7 +20,6 @@ unsigned short is_ksyms_loaded() {
 }
 
 elf32_sym_t *get_ksym_by_address(uint32_t addr) {
-    // FIXME: for some reason in panic() it's getting putc_colored
     if (!is_ksyms_loaded()) {
         return NULL;
     }
