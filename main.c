@@ -26,9 +26,11 @@ void main(uint32_t multiboot_magic, multiboot_info_t *multiboot) {
         return;
     }
 #ifdef LERNEL_KSYMS_ENABLED
-    // TODO: check bit 5 is set (ELF) in multiboot->flags before we do this
-    loadksyms(&multiboot->u.elf_sec);
-    puts("ksyms loaded\n");
+    if ((multiboot->flags & MULTIBOOT_INFO_ELF_SHDR) == MULTIBOOT_INFO_ELF_SHDR) {
+        loadksyms(&multiboot->u.elf_sec);
+        puts("ksyms loaded\n");
+    } else
+        puts("ksyms not available\n");
 #endif
 
     cpu_registers_t *regs;
