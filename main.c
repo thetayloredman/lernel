@@ -17,12 +17,12 @@ void main(uint32_t multiboot_magic, multiboot_info_t *multiboot) {
     // before we can do anything with symbols, we must first
     // make the check that we're using multiboot
     if (multiboot_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
-        cpu_registers_t *regs;
+        cpu_registers_t regs;
 
-        init_regs(regs);
+        init_regs(&regs);
         panic
             ("We were not loaded by a Multiboot-compliant boot-loader!",
-             regs);
+             &regs);
         return;
     }
 #ifdef LERNEL_KSYMS_ENABLED
@@ -33,8 +33,8 @@ void main(uint32_t multiboot_magic, multiboot_info_t *multiboot) {
         puts("ksyms not available\n");
 #endif
 
-    cpu_registers_t *regs;
+    cpu_registers_t regs;
 
-    init_regs(regs);
-    panic("unimplemented", regs);
+    init_regs(&regs);
+    panic("unimplemented", &regs);
 }
