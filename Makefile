@@ -45,3 +45,6 @@ run: iso
 clean:
 	$(RM) -rf *.o $(BIN) $(BIN).map $(ISO_DIR) $(ISO)
 
+.PHONY: format
+format:
+	./indent.sh
