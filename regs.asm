@@ -33,7 +33,6 @@ init_regs:
     ; -> cpu_registers_t * (first parameter) at [esp + 8]
     ; move the pointer passed as the first parameter into eax
     mov eax, [esp + 8]
-    ;mov [eax + cpu_registers_t.eax], eax
     mov [eax + cpu_registers_t.ebx], ebx
     mov [eax + cpu_registers_t.ecx], ecx
     mov [eax + cpu_registers_t.edx], edx
