@@ -18,28 +18,28 @@ struc cpu_registers_t
     .gs: resw 1
     .ss: resw 1
     .eflags: resd 1
-endstruc
+endstruc ; total size: 52 bytes
 
-section .data
+section .text
     global init_regs
 
 ; Small ASM stub to fill out the cpu_registers_t struct
 ; with the current CPU registers.
 init_regs:
-    mov [esp + 4 + cpu_registers_t.eax], eax
-    mov [esp + 4 + cpu_registers_t.ebx], ebx
-    mov [esp + 4 + cpu_registers_t.ecx], ecx
-    mov [esp + 4 + cpu_registers_t.edx], edx
-    mov [esp + 4 + cpu_registers_t.esi], esi
-    mov [esp + 4 + cpu_registers_t.edi], edi
-    mov [esp + 4 + cpu_registers_t.ebp], ebp
-    mov [esp + 4 + cpu_registers_t.esp], esp
-    mov [esp + 4 + cpu_registers_t.cs], cs
-    mov [esp + 4 + cpu_registers_t.ds], ds
-    mov [esp + 4 + cpu_registers_t.es], es
-    mov [esp + 4 + cpu_registers_t.fs], fs
-    mov [esp + 4 + cpu_registers_t.gs], gs
-    mov [esp + 4 + cpu_registers_t.ss], ss
+    mov [esp + 4 + 52 - cpu_registers_t.eax], eax
+    mov [esp + 4 + 52 - cpu_registers_t.ebx], ebx
+    mov [esp + 4 + 52 - cpu_registers_t.ecx], ecx
+    mov [esp + 4 + 52 - cpu_registers_t.edx], edx
+    mov [esp + 4 + 52 - cpu_registers_t.esi], esi
+    mov [esp + 4 + 52 - cpu_registers_t.edi], edi
+    mov [esp + 4 + 52 - cpu_registers_t.ebp], ebp
+    mov [esp + 4 + 52 - cpu_registers_t.esp], esp
+    mov [esp + 4 + 52 - cpu_registers_t.cs], cs
+    mov [esp + 4 + 52 - cpu_registers_t.ds], ds
+    mov [esp + 4 + 52 - cpu_registers_t.es], es
+    mov [esp + 4 + 52 - cpu_registers_t.fs], fs
+    mov [esp + 4 + 52 - cpu_registers_t.gs], gs
+    mov [esp + 4 + 52 - cpu_registers_t.ss], ss
     ; pushfd pushes the EFLAGS register onto the stack
     ; the series of these two following operations was basically what "mov [...], eflags" should have been,
     ; but for some reason that isn't possible
@@ -47,9 +47,9 @@ init_regs:
     ; pop into eax -- we restore eax later
     pop eax
     ; do the actual move
-    mov [esp + 4 + cpu_registers_t.eflags], eax
+    mov [esp + 4 + 52 - cpu_registers_t.eflags], eax
     ; now we're going to work on eip, so we read the stack pointer's value (points to return address)
     mov eax, [esp]
-    mov [esp + 4 + cpu_registers_t.eip], eax
-    mov eax, [esp + 4 + cpu_registers_t.eax]
+    mov [esp + 4 + 52 - cpu_registers_t.eip], eax
+    mov eax, [esp + 4 + 52 - cpu_registers_t.eax]
     ret

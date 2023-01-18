@@ -55,41 +55,50 @@ char *hexify_word(char result[6], uint16_t v) {
     return result;
 }
 
-void trace_stack(unsigned int max) {
-    unsigned short ksyms_loaded = is_ksyms_loaded();
-    if (ksyms_loaded) puts("Call stack:\n");
-    else puts("Call stack (no symbol table information available):\n");
-    struct stackframe *stack;
-    char result[10];
-    asm("mov %%ebp, %0" : "=r"(stack));
-    // we stop when we hit NULL  vvvvvvvv, this is set in boot.asm
-    for (unsigned int frame = 0; stack && (frame < max); frame++) {
-        if(frame==0) puts("-> ");
-        else puts("   ");
-        puts(hexify_double(result, stack->eip));
-        if (ksyms_loaded) {
-            elf32_sym_t *sym = get_ksym_by_address(stack->eip);
-            if (sym) {
-                puts(" (");
-                puts((char *)(get_shdr_string(sym->name)));
-                puts("+");
-                uint32_t diff = stack->eip - sym->value;
-                if (diff > 0xFFFF) {
-                    char smaller_buffer[6];
-                    puts(hexify_double(smaller_buffer, diff));
+#if defined(LERNEL_PANIC_DUMP_STACK) || defined(LERNEL_OOPS_DUMP_STACK)
+    void trace_stack(unsigned int max) {
+#ifdef LERNEL_KSYMS_ENABLED
+        unsigned short ksyms_loaded = is_ksyms_loaded();
+        if (ksyms_loaded) puts("Call stack:\n");
+        else puts("Call stack (no symbol table information available):\n");
+#else
+        puts("Call stack (symbol table information is disabled):\n");
+#endif
+        struct stackframe *stack;
+        char result[10];
+        asm("mov %%ebp, %0" : "=r"(stack));
+        // we stop when we hit NULL  vvvvvvvv, this is set in boot.asm
+        for (unsigned int frame = 0; stack && (frame < max); frame++) {
+            if(frame==0) puts("-> ");
+            else puts("   ");
+            puts(hexify_double(result, stack->eip));
+#ifdef LERNEL_KSYMS_ENABLED
+            if (ksyms_loaded) {
+                elf32_sym_t *sym = get_ksym_by_address(stack->eip);
+                if (sym) {
+                    puts(" (");
+                    puts((char *)(get_shdr_string(sym->name)));
+                    puts("+");
+                    uint32_t diff = stack->eip - sym->value;
+                    if (diff > 0xFFFF) {
+                        puts(hexify_double(result, diff));
+                    } else {
+                        char smaller_buffer[6];
+                        puts(hexify_word(smaller_buffer, diff));
+                    }
+                    puts(")");
                 } else {
-                    puts(hexify_word(result, diff));
+                    puts(" (unknown)");
                 }
-                puts(")");
-            } else {
-                puts(" (unknown)");
             }
+#endif
+            puts("\n");
+            stack = stack->ebp;
         }
-        puts("\n");
-        stack = stack->ebp;
     }
-}
+#endif
 
+#if defined(LERNEL_PANIC_DUMP_REGISTERS) || defined(LERNEL_OOPS_DUMP_REGISTERS)
 // Takes an input rname and outputs code to print it
 // Requires the following variables to be set already:
 //   char buff[10];
@@ -98,7 +107,6 @@ void trace_stack(unsigned int max) {
 // - prefix_string: the string to print before the register name
 // - rname: the name of the register (no quotes)
 // - rtype: word or double, no quotes (which hexify func to use)
-#if defined(LERNEL_PANIC_DUMP_REGISTERS) || defined(LERNEL_OOPS_DUMP_REGISTERS)
 #   define DO_PRINT_REGISTER(prefix_string, rname, rtype) \
         puts(prefix_string #rname ":"); \
         puts(hexify_##rtype(buff, regs->rname));
@@ -125,7 +133,7 @@ void trace_stack(unsigned int max) {
         puts("\n\n");
         puts("EFLAGS: ");
         puts(hexify_double(buff, regs->eflags));
-        puts("\n\n");
+        puts("\n");
     }
 #endif
 
@@ -137,13 +145,16 @@ void panic(const char *message, cpu_registers_t *regs) {
     // TODO: cpu type and stuff
 
 #   ifdef LERNEL_PANIC_DUMP_REGISTERS
+        puts("\n");
         dump_registers(regs);
 #   endif
 
-    // TODO: pick a more specific limit value
-    trace_stack(5);
+#   ifdef LERNEL_PANIC_DUMP_STACK
+        puts("\n");
+        trace_stack(LERNEL_STACK_DUMP_LIMIT);
+#   endif
 
-    puts("end kernel panic: ");
+    puts("\nend kernel panic: ");
     puts(message);
     puts("\nhalting system.");
     asm("cli");
@@ -161,10 +172,13 @@ void oops(const char *message, cpu_registers_t *regs) {
         dump_registers(regs);
 #   endif
 
-    // TODO: pick a more specific limit value
-    trace_stack(5);
+    puts("\n");
 
-    puts("end oops: ");
+#   ifdef LERNEL_OOPS_DUMP_STACK
+        trace_stack(LERNEL_STACK_DUMP_LIMIT);
+#   endif
+
+    puts("\nend oops: ");
     puts(message);
     puts("\n");
 }

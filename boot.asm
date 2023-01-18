@@ -33,7 +33,10 @@ _start:
 
     push exit_msg
     call puts
-    hlt                     ; stop the cpu
+halt: ; loop in case of a NMI
+    cli
+    hlt
+    jmp halt
 
 section .bss
     resb 8192               ; for stack

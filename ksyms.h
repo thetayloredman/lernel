@@ -1,6 +1,9 @@
 #pragma once
 #include <multiboot.h>
 #include <types.h>
+#include <config.h>
+
+#ifdef LERNEL_KSYMS_ENABLED
 
 struct elf32_shdr {
     uint32_t name; // index into the string table
@@ -29,3 +32,6 @@ typedef struct elf32_sym elf32_sym_t;
 unsigned short is_ksyms_loaded();
 void loadksyms(multiboot_elf_section_header_table_t *);
 char *get_shdr_string(uint32_t);
+elf32_sym_t *get_ksym_by_address(uint32_t);
+
+#endif
