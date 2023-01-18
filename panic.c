@@ -67,6 +67,7 @@ void trace_stack(unsigned int max) {
     puts("Call stack (symbol table information is disabled):\n");
 #   endif
     struct stackframe *stack;
+
     // FIXME: do we need to allocate space for a null? see man strcpy(3)'s note on programmer requirements to allocate a buffer
     char result[10];
 
