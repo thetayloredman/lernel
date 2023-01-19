@@ -1,4 +1,3 @@
-; FIXME: why won't the debug symbols load here?
 bits 32
 
 struc cpu_registers_t
