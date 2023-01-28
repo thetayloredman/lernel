@@ -25,6 +25,11 @@ void main(uint32_t multiboot_magic, multiboot_info_t *multiboot) {
              &regs);
         return;
     }
+
+    // Guess what, we're in the higher half now! The problem is,
+    // we first have to unload our initial identity page, and we
+    // need to get the Multiboot structure mapped in.
+
 #ifdef LERNEL_KSYMS_ENABLED
     if ((multiboot->flags & MULTIBOOT_INFO_ELF_SHDR) == MULTIBOOT_INFO_ELF_SHDR) {
         loadksyms(&multiboot->u.elf_sec);

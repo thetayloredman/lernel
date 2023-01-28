@@ -17,12 +17,12 @@ void vga_scroll(void) {
     // We will loop over every character except the first VGA_COLUMNS size.
     unsigned int newIndex = 0;
 
-    for (unsigned int oldIndex = VGA_COLUMNS; oldIndex < VGA_BUFFER_SIZE;
+    for (unsigned int oldIndex = VGA_COLUMNS; oldIndex < VGA_BUFFER_CHARS;
          oldIndex++, newIndex++) {
         terminal_buffer[newIndex] = terminal_buffer[oldIndex];
     }
     // Write an empty line.
-    for (; newIndex < VGA_BUFFER_SIZE; newIndex++) {
+    for (; newIndex < VGA_BUFFER_CHARS; newIndex++) {
         terminal_buffer[newIndex] = 0;
     }
 
@@ -44,6 +44,7 @@ void putc_colored(char c, unsigned short color) {
     } else if (c == '\r') {
         vga_column = 0;
     } else {
+        // TODO: separate fg and bg colors
         terminal_buffer[get_vga_index()] = (unsigned short)c | color << 8;
         vga_column++;
         if (vga_column >= VGA_COLUMNS) {
@@ -70,12 +71,14 @@ void puts(const char *s) {
 }
 
 void clear(void) {
-    for (int i = 0; i < VGA_BUFFER_SIZE; i++) {
-        terminal_buffer[i] = 0;
-    }
+    // TODO: separate function to reset position
     vga_row = 0;
     vga_column = 0;
+    for (int i = 0; i < VGA_BUFFER_CHARS; i++) {
+        terminal_buffer[i] = 0;
+    }
 }
+
 
 void tty_init(void) {
     terminal_buffer = (unsigned short *)VGA_ADDRESS;

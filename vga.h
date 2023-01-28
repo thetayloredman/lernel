@@ -1,6 +1,7 @@
 #pragma once
 
-#define VGA_ADDRESS 0xB8000
+#define VGA_ADDRESS 0xb8000
+#define PHYS_VGA_ADDRESS 0xb8000
 
 #define BLACK 0
 #define BLUE 1
@@ -22,5 +23,6 @@
 #define VGA_ROWS 25
 #define VGA_COLUMNS 80
 
+#define VGA_BUFFER_CHARS VGA_ROWS * VGA_COLUMNS
 // * 2 for 2 bytes each
-#define VGA_BUFFER_SIZE VGA_ROWS * VGA_COLUMNS * 2
+#define VGA_BUFFER_SIZE VGA_BUFFER_CHARS * 2

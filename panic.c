@@ -174,8 +174,10 @@ void panic(const char *message, cpu_registers_t *regs) {
     puts("\nend kernel panic: ");
     puts(message);
     puts("\nhalting system.");
-    asm("cli");
-    asm("hlt");
+    while (1) {
+        asm volatile("cli");
+        asm volatile("hlt");
+    }
 }
 
 void oops(const char *message, cpu_registers_t *regs) {

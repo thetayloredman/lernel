@@ -21,3 +21,6 @@
 -T int8_t
 -T int16_t
 -T int32_t
+-T uintptr_t
+-T page_directory_entry_32_t
+-T page_table_entry_32_t
