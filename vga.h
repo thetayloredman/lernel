@@ -1,6 +1,6 @@
 #pragma once
 
-#define VGA_ADDRESS 0xb8000
+#define VGA_ADDRESS 0xc00b8000
 #define PHYS_VGA_ADDRESS 0xb8000
 
 #define BLACK 0
@@ -26,3 +26,8 @@
 #define VGA_BUFFER_CHARS VGA_ROWS * VGA_COLUMNS
 // * 2 for 2 bytes each
 #define VGA_BUFFER_SIZE VGA_BUFFER_CHARS * 2
+
+void disable_cursor(void);
+void vga_putc_provider(char c, unsigned short color);
+void vga_clear_provider(void);
+void vga_init(void);

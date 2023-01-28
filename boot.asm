@@ -11,6 +11,7 @@ section .phys.text exec
     extern early_paging_init
     extern _physical_start
     extern _physical_end
+    extern early_page_directory
 _start:
     cli                     ; bye bye interrupts
     xor  ebp, ebp
@@ -68,13 +69,18 @@ kernel_fits:
     or eax, 0x3 ; set the present and rw bits
     mov [edi], eax
 
-    ; now, let's set the 184th page table entry to point to VRAM
-    ; edi is now the pointer to our page table #1
-    ; eax is the pointer to VRAM
-    mov edi, early_page_table_1
-    add edi, 184 * 4
-    mov eax, 0xb8000
-    or  eax, 0x3 ; set the present and rw bits
+    ; I also read that we can point the last page directory entry to itself, which would allow
+    ; easier modification of it by convincing the CPU that the page directory itself is a page table,
+    ; meaning that a memory access would instead of reading memory, would read a page table entry
+    ; this is basically pushing all of our memory down a step, so we get values like this:
+    ; 1111111111 XXXXXXXXXX 00YYYYYYYYYY
+    ; constant   pdir ent     ptab ent
+    ; let's do that! the constant value there would be entry 1023
+    mov eax, early_page_directory
+    mov edi, early_page_directory
+    add edi, 1023 * 4
+    and eax, 0xfffff000 ; clear the lower 12 bits
+    or eax, 0x3 ; set the present and rw bits
     mov [edi], eax
 
     ; now, let's identity map the kernel in the lower half

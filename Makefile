@@ -13,7 +13,7 @@ QEMU_ARGS = -m $(QEMU_MEM) $(ADDITIONAL_QEMU_ARGS)
 # for debug targets
 AS_GDB_ARGS = -F dwarf -g
 CC_GDB_ARGS = -gdwarf
-QEMU_GDB_ARGS = -S -s -d int
+QEMU_GDB_ARGS = -S -s -d int -monitor stdio
 
 BIN = lernel
 ISO = lernel.iso
@@ -33,8 +33,8 @@ all: lernel iso
 %.o: %.c
 	$(CC) $(CC_ARGS) -c $^ -o $@
 
-lernel: linker.ld boot.o boot-virt.o main.o tty.o ports.o panic.o regs.o ksyms.o strings.o paging-utils.o paging.o
-	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o boot-virt.o main.o tty.o ports.o panic.o regs.o ksyms.o strings.o paging-utils.o paging.o
+lernel: linker.ld boot.o boot-virt.o main.o tty.o ports.o panic.o regs.o ksyms.o strings.o paging-utils.o paging.o vga.o
+	$(LD) -m elf_i386 -T linker.ld -o $(BIN) boot.o boot-virt.o main.o tty.o ports.o panic.o regs.o ksyms.o strings.o paging-utils.o paging.o vga.o
 
 iso: lernel lernel.map
 	$(MKDIR) -p $(ISO_DIR)/boot/grub

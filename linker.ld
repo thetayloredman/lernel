@@ -16,6 +16,7 @@ SECTIONS {
     .text ALIGN(4k) : AT(ADDR(.text) - 0xC0000000) { *(.text) }
     .data ALIGN(4k) : AT(ADDR(.data) - 0xC0000000) { *(.data) }
     .bss  ALIGN(4k) : AT(ADDR(.bss)  - 0xC0000000) { *(.bss)  }
+    .rodata ALIGN(4k) : AT(ADDR(.rodata) - 0xC0000000) { *(.rodata) }
 
     _physical_end = . - 0xC0000000;
 }

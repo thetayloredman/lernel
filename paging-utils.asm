@@ -1,9 +1,10 @@
 bits 32
 
 section .text
-    global reload_cr3
+    global flush_tlb
 
-reload_cr3:
+flush_tlb:
+    ; TODO: is there a faster way to do this?
     mov eax, cr3
     mov cr3, eax
     ret
